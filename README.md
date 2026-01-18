@@ -1,37 +1,106 @@
-# Behavioral Health Vault (BHV) 2026
+# Project Overview
 
-The Behavioral Health Vault (BHV) is a minimalist, single-command functional prototype designed for UAA/UAF behavioral health research. It allows patients to record their recovery journeys through text narratives and visual media, ensuring data ownership through private "Cloud Vaults".
+The Behavioral Health Vault (BHV) is a functional prototype developed to support behavioral health research at UAA/UAF. In the current healthcare landscape, patient data is often fragmented across disparate clinical systems ("silos"), making it difficult for patients to maintain a continuous record of their recovery journey.
 
-# Features implemented 
+BHV disrupts this model. It is a single-command, local-first application that allows patients to record their recovery through text narratives and visual media. Crucially, it introduces a "Hybrid Sovereignty" architecture: while the app runs locally for speed and privacy, it automatically syncs encrypted data to a private, patient-controlled GitHub repository. This ensures that the patient—not the hospital—retains permanent ownership of their digital health history.
 
- Zero-Config Backend: Powered by FastAPI and SQLite for immediate deployment.
-Dual-Layer Storage:
-    Local Vault: Narratives and image metadata stored in `vault.db` (SQLModel).
-    Cloud Sync: Automated creation of Private GitHub Repositories for each patient to ensure data sovereignty.
-Dynamic Recovery Gallery: A real-time UI that displays stored narratives and images locally.
-Automatic Deduplication: Logic to prevent duplicate entries during browser refreshes or resubmissions.
+# Technical Architecture
 
-## Project Structure
+The application is built on a modular, lightweight stack designed for rapid deployment in resource-constrained environments (e.g., rural clinics or personal laptops).
 
-* `main.py`: The core FastAPI application logic.
-* `models.py`: Database blueprints using SQLModel.
-* `github_service.py`: Integration with the GitHub API via PyGithub.
-* `database/`: Contains the binary `vault.db` SQLite file.
-* `uploads/`: Local directory for patient-provided media.
+1. The Backend Core (FastAPI)
+Framework: We utilize FastAPI for its high performance and native support for asynchronous operations.
 
-# Clone the repository
-git clone  https://github.com/kunal-595/BHV-Development-2026.git
+Role: Handles HTTP requests, serves the Jinja2 templates for the UI, and manages the background tasks for cloud synchronization.
+
+2.The Local Persistence Layer (SQLite + SQLModel)
+Database: A local vault.db SQLite database ensures the application works offline-first.
+
+ORM: We use SQLModel (a combination of Pydantic and SQLAlchemy) to define rigorous data schemas. This ensures that every narrative entered meets strict validation rules before it is ever stored.
+
+3.The Sovereign Cloud Layer (PyGithub)
+Integration: The github_service.py module acts as a bridge to the GitHub API.
+
+Function: Instead of sending data to a central corporate server, the system dynamically provisions a Private Repository (e.g., BHV-Vault-John-Doe) using the patient's own credentials.
+
+Security: All cloud interactions are authenticated via secure tokens, ensuring that the application never stores passwords.
+
+# Key Features
+
+1.Zero-Config Deployment
+The system is designed to "drop and run." By using SQLite, we eliminate the need for complex server setups like PostgreSQL or Docker containers for the initial prototype. A simple python main.py is all that is needed to start the server.
+
+2.Automated Data Sovereignty
+When a patient submits a journal entry or uploads a recovery image:
+
+Local Save: The data is immediately committed to the local database.
+
+Cloud Check: The system checks if the patient has a valid Cloud Vault.
+
+Sync: If a vault exists, the data is pushed to the cloud in the background. If not, the system automatically creates the vault first.
+
+3.Intelligent Deduplication
+Duplicate data is a common issue in medical records. BHV implements logic to check for existing filenames and narrative timestamps. If a user accidentally refreshes the submission page, the system detects the duplicate attempt and prevents database corruption.
+
+4.Dynamic Recovery Gallery
+The frontend features a responsive gallery that renders patient uploads in real-time. This serves as a "visual diary," allowing patients to see their progress and emotional states evolve over time.
+
+# Project Structure
+
+A clean structure ensures maintainability and scalability.
+
+BHV-Development-2026/
+├── database/
+│   └── vault.db            # Binary SQLite database (Auto-generated)
+├── uploads/                # Local storage for patient images
+├── templates/
+│   └── index.html          # Jinja2 frontend interface
+├── .gitignore              # Security rules for version control
+├── github_service.py       # Cloud integration logic
+├── main.py                 # Application entry point & API routes
+├── models.py               # SQLModel database schemas
+├── requirements.txt        # Python dependencies
+└── README.md               # Documentation
+
+Installation & Setup Guide
+Follow these steps to deploy a local instance of the Vault.
+
+Prerequisites
+Python 3.10 or higher
+
+Git
+
+A GitHub Account (for Cloud Sync features)
+
+Step 1: Clone the Repository
+git clone https://github.com/kunal-595/BHV-Development-2026.git
+
 cd BHV-Development-2026
-# Create and activate a virtual environment
+
+Step 2: Create a Virtual Environment
+# Windows
 python -m venv venv
-# On Windows:
 venv\Scripts\activate
-# On Mac/Linux:
+
+# macOS / Linux
+python3 -m venv venv
 source venv/bin/activate
-# Install the Toolkit
+
+Step 3: Install Dependencies
 pip install -r requirements.txt
-# Configure Your Credentials
-GITHUB_TOKEN=your_personal_access_token_here
-# Launch the Vault
+
+Step 4: Configure Security Credentials
+To protect your API keys, we use environment variables.
+
+Create a file named .env in the root directory.
+
+Add your GitHub Personal Access Token (PAT):
+GITHUB_TOKEN=ghp_your_secure_token_here
+
+Step 5: Launch the Application
 python main.py
 
+# Security & Privacy
+Token Protection: API tokens are loaded via python-dotenv and are never hardcoded into the source files. The .gitignore file explicitly excludes .env to prevent accidental exposure.
+
+Private by Default: All cloud repositories generated by the system are set to private=True, ensuring that only the patient (the token holder) can access the data.
