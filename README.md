@@ -30,6 +30,8 @@ venv\Scripts\activate
 source venv/bin/activate
 # Install the Toolkit
 pip install -r requirements.txt
+# Configure Your Credentials
+GITHUB_TOKEN=your_personal_access_token_here
 # Launch the Vault
 python main.py
 
