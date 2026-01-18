@@ -2,7 +2,7 @@
 
 The Behavioral Health Vault (BHV) is a minimalist, single-command functional prototype designed for UAA/UAF behavioral health research. It allows patients to record their recovery journeys through text narratives and visual media, ensuring data ownership through private "Cloud Vaults".
 
-# Features implemented (Day 2)
+# Features implemented 
 
  Zero-Config Backend: Powered by FastAPI and SQLite for immediate deployment.
 Dual-Layer Storage:
@@ -20,9 +20,8 @@ Automatic Deduplication: Logic to prevent duplicate entries during browser refre
 * `uploads/`: Local directory for patient-provided media.
 
 # Clone the repository
-git clone <your-repository-url>
+git clone  https://github.com/kunal-595/BHV-Development-2026.git
 cd BHV-Development-2026
-
 # Create and activate a virtual environment
 python -m venv venv
 # On Windows:
@@ -33,3 +32,4 @@ source venv/bin/activate
 pip install -r requirements.txt
 # Launch the Vault
 python main.py
+
