@@ -62,13 +62,14 @@ BHV-Development-2026/
 ├── requirements.txt        # Python dependencies
 └── README.md               # Documentation
 
-Installation & Setup Guide
+Installation & Setup Guide.
+---
 Follow these steps to deploy a local instance of the Vault.
 
 # Prerequisites
-Python 3.10 or higher
-Git
-A GitHub Account (for Cloud Sync features)
+1.Python 3.10 or higher
+2.Git
+3.A GitHub Account (for Cloud Sync features)
 
 Step 1: Clone the Repository
 git clone https://github.com/kunal-595/BHV-Development-2026.git
